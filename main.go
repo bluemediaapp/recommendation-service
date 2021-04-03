@@ -12,6 +12,7 @@ import (
 
 var (
 	app    = fiber.New()
+	config *Config
 	client *mongo.Client
 	mctx   = context.Background()
 
@@ -20,6 +21,11 @@ var (
 )
 
 func main() {
+	config = &Config{
+		port:     os.Getenv("port"),
+		mongoUri: os.Getenv("mongo_uri"),
+	}
+
 	initDb()
 
 	// Modules
@@ -27,13 +33,13 @@ func main() {
 	userClassifications()
 
 	log.Printf("Running on port 3000!")
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(config.port))
 }
 
 func initDb() {
 	// Connect mongo
 	var err error
-	client, err = mongo.NewClient(options.Client().ApplyURI(os.Getenv("mongo_uri")))
+	client, err = mongo.NewClient(options.Client().ApplyURI(config.mongoUri))
 	if err != nil {
 		log.Fatal(err)
 	}

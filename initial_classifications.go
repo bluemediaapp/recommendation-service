@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
-	"strings"
 )
 
 func initialClassifications() {
@@ -29,13 +28,6 @@ func initialClassifications() {
 		for tagId := range video.Tags {
 			tag := video.Tags[tagId]
 			if isBadTopic(tag) {
-				result.BadTopics += 1
-			}
-		}
-		words := strings.Split(video.Description, " ")
-		for descriptionId:= range words {
-			word := words[descriptionId]
-			if isBadTopic(word) {
 				result.BadTopics += 1
 			}
 		}
