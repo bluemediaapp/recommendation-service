@@ -7,7 +7,7 @@ import (
 )
 
 func initialClassifications() {
-	app.Post("/initial/classify/:video_id", func(ctx *fiber.Ctx) error {
+	app.Post("/initial/:video_id", func(ctx *fiber.Ctx) error {
 		// Query data
 		videoId := ctx.Params("video_id")
 
