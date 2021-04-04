@@ -16,8 +16,8 @@ var (
 	client *mongo.Client
 	mctx   = context.Background()
 
-	videosCollection *mongo.Collection
-	badTopicsCollection *mongo.Collection
+	videosCollection        *mongo.Collection
+	badTopicsCollection     *mongo.Collection
 	watchedVideosCollection *mongo.Collection
 )
 
@@ -44,7 +44,6 @@ func initDb() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 
 	err = client.Connect(mctx)
 	if err != nil {

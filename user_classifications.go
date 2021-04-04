@@ -92,7 +92,7 @@ func getAllVideos() []databaseVideo {
 
 func hasWatchedVideo(user databaseUser, video databaseVideo) bool {
 	filter := bson.D{{"user_id", user.Id}, {"video_id", video.Id}}
-	documentCount, err := videosCollection.CountDocuments(mctx, filter)
+	documentCount, err := watchedVideosCollection.CountDocuments(mctx, filter)
 	if err != nil {
 		log.Print(err)
 		return true
