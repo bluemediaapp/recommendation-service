@@ -28,8 +28,7 @@ func userClassifications() {
 }
 
 func getVideos(user databaseUser) []databaseVideo {
-	videos := getAllVideos()
-	log.Print(len(videos))
+	videos := getRandomVideos(100)
 	scoredVideos := make(map[float64]databaseVideo)
 
 	for videoId := range videos {
@@ -90,8 +89,10 @@ func getVideos(user databaseUser) []databaseVideo {
 	return sortedVideos
 }
 
-func getAllVideos() []databaseVideo {
-	rawVideos, err := videosCollection.Find(mctx, bson.D{})
+func getRandomVideos(count int) []databaseVideo {
+	// Gets x random videos
+	query := []bson.D{bson.D{{"$sample", bson.D{{"size", count}}}}}
+	rawVideos, err := videosCollection.Aggregate(mctx, query)
 	if err != nil {
 		log.Printf("find")
 		log.Print(err)
