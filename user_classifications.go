@@ -68,7 +68,7 @@ func getVideos(user databaseUser) []databaseVideo {
 	sort.Float64s(keys)
 	sortedVideos := make([]databaseVideo, 0)
 	for score, video := range scoredVideos {
-		log.Printf("%s - %f", video.Title, score)
+		log.Printf("%s - %f", video.Description, score)
 		sortedVideos = append(sortedVideos, video)
 	}
 	return sortedVideos
