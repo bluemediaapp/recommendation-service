@@ -10,8 +10,8 @@ import (
 
 func userClassifications() {
 	app.Post("/user/:user_id", func(ctx *fiber.Ctx) error {
-		getVideos(databaseUser{Interests: make([]string, 0)})
-		return nil
+		videos := getVideos(databaseUser{Interests: make([]string, 0)})
+		return ctx.JSON(videos)
 	})
 }
 
@@ -52,8 +52,6 @@ func getVideos(user databaseUser) []databaseVideo {
 			badTopicsScore = .1
 		}
 
-
-
 		// Calculate score
 		score = 1000.0
 		score = score * ((interestScore * 10) + .1)
@@ -63,12 +61,12 @@ func getVideos(user databaseUser) []databaseVideo {
 		scoredVideos[score] = video
 	}
 	// Sort
-	keys := make([]float64, 0, len(scoredVideos))
+	keys := make([]float64, 0)
 	for k := range scoredVideos {
 		keys = append(keys, k)
 	}
 	sort.Float64s(keys)
-	sortedVideos := make([]databaseVideo, len(scoredVideos))
+	sortedVideos := make([]databaseVideo, 0)
 	for score, video := range scoredVideos {
 		log.Printf("%s - %f", video.Title, score)
 		sortedVideos = append(sortedVideos, video)
