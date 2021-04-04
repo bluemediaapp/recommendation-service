@@ -5,12 +5,24 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"sort"
+	"strconv"
 	"strings"
 )
 
 func userClassifications() {
 	app.Post("/user/:user_id", func(ctx *fiber.Ctx) error {
-		videos := getVideos(databaseUser{Interests: make([]string, 0)})
+		// Get the user
+		userId, err := strconv.ParseInt(ctx.Params("user_id"), 10, 64)
+		if err != nil {
+			return err
+		}
+
+		user, err := getUser(userId)
+		if err != nil {
+			return err
+		}
+
+		videos := getVideos(user)
 		return ctx.JSON(videos)
 	})
 }
@@ -48,7 +60,7 @@ func getVideos(user databaseUser) []databaseVideo {
 		// A score starting at 1 getting .25 removed for every bad topic
 		// Minimum value is .1
 		badTopicsScore := 1 - (float64(video.BadTopics) * .25)
-		if badTopicsScore > 0 {
+		if badTopicsScore <= 0 {
 			badTopicsScore = .1
 		}
 
@@ -98,4 +110,15 @@ func hasWatchedVideo(user databaseUser, video databaseVideo) bool {
 		return true
 	}
 	return documentCount == int64(1)
+}
+
+func getUser(userId int64) (databaseUser, error) {
+	query := bson.D{{"_id", userId}}
+	rawVideo := usersCollection.FindOne(mctx, query)
+	var user databaseUser
+	err := rawVideo.Decode(&user)
+	if err != nil {
+		return databaseUser{}, err
+	}
+	return user, nil
 }

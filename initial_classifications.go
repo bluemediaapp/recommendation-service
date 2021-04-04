@@ -22,7 +22,6 @@ func initialClassifications() {
 		if err != nil {
 			return err
 		}
-		video.Id = videoId
 
 		// Process the data
 		result := initialClassificationResult{}
