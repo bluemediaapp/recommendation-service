@@ -4,9 +4,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
+	"math"
 	"sort"
 	"strconv"
-	"strings"
 )
 
 func userClassifications() {
@@ -46,14 +46,18 @@ func getVideos(user databaseUser) []databaseVideo {
 		// This should be a multiplier (0-1)
 
 		interestScore := 0.0
-		interestsJoined := strings.Join(user.Interests, " ")
 		for tagId := range video.Tags {
 			tag := video.Tags[tagId]
-			if strings.Contains(interestsJoined, tag) {
-				interestScore = (interestScore + 1) / 2
-			} else {
+			thisInterestScore, exists := user.Interests[tag]
+			if !exists {
 				interestScore = interestScore / 2
+				continue
 			}
+			calculatedScore := math.Min(float64(thisInterestScore) /100.0, 1)
+			interestScore = (interestScore + calculatedScore) / 2
+		}
+		if interestScore < 0 {
+			interestScore = 0
 		}
 
 		// Bad topics score

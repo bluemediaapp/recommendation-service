@@ -26,7 +26,7 @@ type databaseUser struct {
 	Username string `bson:"username" json:"username"`
 
 	// Backend metadata
-	Interests []string `bson:"interests" json:"interests"`
+	Interests map[string]int64 `bson:"interests" json:"interests"`
 }
 
 // Watching
