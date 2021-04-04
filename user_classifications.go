@@ -22,12 +22,12 @@ func userClassifications() {
 			return err
 		}
 
-		videos := getVideos(user)
+		videos := getRecommendedVideos(user)
 		return ctx.JSON(videos)
 	})
 }
 
-func getVideos(user databaseUser) []databaseVideo {
+func getRecommendedVideos(user databaseUser) []databaseVideo {
 	videos := getRandomVideos(100)
 	scoredVideos := make(map[float64]databaseVideo)
 
@@ -82,8 +82,7 @@ func getVideos(user databaseUser) []databaseVideo {
 	}
 	sort.Float64s(keys)
 	sortedVideos := make([]databaseVideo, 0)
-	for score, video := range scoredVideos {
-		log.Printf("%s - %f", video.Description, score)
+	for _, video := range scoredVideos {
 		sortedVideos = append(sortedVideos, video)
 	}
 	return sortedVideos
@@ -94,15 +93,15 @@ func getRandomVideos(count int) []databaseVideo {
 	query := []bson.D{bson.D{{"$sample", bson.D{{"size", count}}}}}
 	rawVideos, err := videosCollection.Aggregate(mctx, query)
 	if err != nil {
-		log.Printf("find")
 		log.Print(err)
+		return []databaseVideo{}
 	}
 	var videos []databaseVideo
 
 	err = rawVideos.All(mctx, &videos)
 	if err != nil {
 		log.Print(err)
-		return nil
+		return []databaseVideo{}
 	}
 	return videos
 }

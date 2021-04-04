@@ -42,7 +42,6 @@ func main() {
 	initialClassifications()
 	userClassifications()
 
-	log.Printf("Running on port 3000!")
 	log.Fatal(app.Listen(config.port))
 }
 
