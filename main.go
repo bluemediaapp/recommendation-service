@@ -18,6 +18,7 @@ var (
 
 	videosCollection *mongo.Collection
 	badTopicsCollection *mongo.Collection
+	watchedVideosCollection *mongo.Collection
 )
 
 func main() {
@@ -54,6 +55,7 @@ func initDb() {
 	db := client.Database("blue")
 	videosCollection = db.Collection("video_metadata")
 	badTopicsCollection = db.Collection("bad_topics")
+	watchedVideosCollection = db.Collection("watched_videos")
 }
 
 func isBadTopic(topic string) bool {

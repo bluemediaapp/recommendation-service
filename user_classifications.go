@@ -22,6 +22,11 @@ func getVideos(user databaseUser) []databaseVideo {
 
 	for videoId := range videos {
 		video := videos[videoId]
+
+		if hasWatchedVideo(user, video) {
+			continue
+		}
+
 		score := 0.0
 
 		// Interest score
@@ -47,9 +52,11 @@ func getVideos(user databaseUser) []databaseVideo {
 			badTopicsScore = .1
 		}
 
+
+
 		// Calculate score
 		score = 1000.0
-		score = score * ((interestScore + 1) *.5)
+		score = score * ((interestScore * 10) + .1)
 		score = score * badTopicsScore
 
 		// Save score
@@ -83,4 +90,14 @@ func getAllVideos() []databaseVideo {
 		return nil
 	}
 	return videos
+}
+
+func hasWatchedVideo(user databaseUser, video databaseVideo) bool {
+	filter := bson.D{{"user_id", user.Id}, {"video_id", video.Id}}
+	documentCount, err := videosCollection.CountDocuments(mctx, filter)
+	if err != nil {
+		log.Print(err)
+		return true
+	}
+	return documentCount == int64(1)
 }
