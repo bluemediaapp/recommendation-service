@@ -1,1 +1,1 @@
-go run config.go models.go initial_classifications.go user_classifications.go main.go
+go run config.go models.go initial_classifications.go recommendations.go main.go
