@@ -85,6 +85,9 @@ func getRecommendedVideos(user databaseUser) []databaseVideo {
 	for _, video := range scoredVideos {
 		sortedVideos = append(sortedVideos, video)
 	}
+	if len(sortedVideos) > 10 {
+		sortedVideos = sortedVideos[:9]
+	}
 	return sortedVideos
 }
 
