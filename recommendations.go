@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"math"
 	"sort"
@@ -111,7 +112,10 @@ func getRandomVideos(count int) []databaseVideo {
 
 func hasWatchedVideo(user databaseUser, video databaseVideo) bool {
 	filter := bson.D{{"user_id", user.Id}, {"video_id", video.Id}}
-	documentCount, err := watchedVideosCollection.CountDocuments(mctx, filter)
+	var limit int64 = 1
+	documentCount, err := watchedVideosCollection.CountDocuments(mctx, filter, &options.CountOptions{
+		Limit: &limit,
+	})
 	if err != nil {
 		log.Print(err)
 		return true

@@ -9,6 +9,8 @@ type databaseVideo struct {
 	VideoLength int32  `bson:"video_length" json:"video_length"`
 	Public      bool   `bson:"public" json:"public"`
 
+	Likes int64 `bson:"likes"`
+
 	// Backend metadata
 	Tags          []string `bson:"tags" json:"tags"`
 	Modifiers     []string `bson:"modifiers" json:"modifiers"`
@@ -33,7 +35,6 @@ type databaseUser struct {
 type databaseWatchEvent struct {
 	VideoId     int64 `bson:"video_id" json:"video_id"`
 	UserId      int64 `bson:"user_id" json:"user_id"`
-	TimeWatched int32  `bson:"time_watched" json:"time_watched"`
 }
 
 type databaseLikeEvent struct {
