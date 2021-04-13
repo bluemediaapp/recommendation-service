@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/bluemediaapp/models"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -28,9 +29,9 @@ func userClassifications() {
 	})
 }
 
-func getRecommendedVideos(user databaseUser) []databaseVideo {
+func getRecommendedVideos(user models.DatabaseUser) []models.DatabaseVideo {
 	videos := getRandomVideos(100)
-	scoredVideos := make(map[float64]databaseVideo)
+	scoredVideos := make(map[float64]models.DatabaseVideo)
 
 	for videoId := range videos {
 		video := videos[videoId]
@@ -82,7 +83,7 @@ func getRecommendedVideos(user databaseUser) []databaseVideo {
 		keys = append(keys, k)
 	}
 	sort.Float64s(keys)
-	sortedVideos := make([]databaseVideo, 0)
+	sortedVideos := make([]models.DatabaseVideo, 0)
 	for _, video := range scoredVideos {
 		sortedVideos = append(sortedVideos, video)
 	}
@@ -92,25 +93,25 @@ func getRecommendedVideos(user databaseUser) []databaseVideo {
 	return sortedVideos
 }
 
-func getRandomVideos(count int) []databaseVideo {
+func getRandomVideos(count int) []models.DatabaseVideo {
 	// Gets x random videos
 	query := []bson.D{bson.D{{"$sample", bson.D{{"size", count}}}}}
 	rawVideos, err := videosCollection.Aggregate(mctx, query)
 	if err != nil {
 		log.Print(err)
-		return []databaseVideo{}
+		return []models.DatabaseVideo{}
 	}
-	var videos []databaseVideo
+	var videos []models.DatabaseVideo
 
 	err = rawVideos.All(mctx, &videos)
 	if err != nil {
 		log.Print(err)
-		return []databaseVideo{}
+		return []models.DatabaseVideo{}
 	}
 	return videos
 }
 
-func hasWatchedVideo(user databaseUser, video databaseVideo) bool {
+func hasWatchedVideo(user models.DatabaseUser, video models.DatabaseVideo) bool {
 	filter := bson.D{{"user_id", user.Id}, {"video_id", video.Id}}
 	var limit int64 = 1
 	documentCount, err := watchedVideosCollection.CountDocuments(mctx, filter, &options.CountOptions{
@@ -123,13 +124,13 @@ func hasWatchedVideo(user databaseUser, video databaseVideo) bool {
 	return documentCount == int64(1)
 }
 
-func getUser(userId int64) (databaseUser, error) {
+func getUser(userId int64) (models.DatabaseUser, error) {
 	query := bson.D{{"_id", userId}}
 	rawVideo := usersCollection.FindOne(mctx, query)
-	var user databaseUser
+	var user models.DatabaseUser
 	err := rawVideo.Decode(&user)
 	if err != nil {
-		return databaseUser{}, err
+		return models.DatabaseUser{}, err
 	}
 	return user, nil
 }

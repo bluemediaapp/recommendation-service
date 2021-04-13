@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/bluemediaapp/models"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"strconv"
@@ -17,14 +18,14 @@ func initialClassifications() {
 		// Fetch the db entry
 		query := bson.D{{"_id", videoId}}
 		rawVideo := videosCollection.FindOne(mctx, query)
-		var video databaseVideo
+		var video models.DatabaseVideo
 		err = rawVideo.Decode(&video)
 		if err != nil {
 			return err
 		}
 
 		// Process the data
-		result := initialClassificationResult{}
+		result := models.InitialClassificationResult{}
 
 		// Get the amount of bad tags
 		// TODO: Transcriptions?
