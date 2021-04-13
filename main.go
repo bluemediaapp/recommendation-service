@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,7 +17,6 @@ var (
 	config  *Config
 	client  *mongo.Client
 	mctx    = context.Background()
-	rclient *redis.Client
 
 	videosCollection        *mongo.Collection
 	badTopicsCollection     *mongo.Collection
@@ -30,13 +28,11 @@ func main() {
 	config = &Config{
 		port:     os.Getenv("port"),
 		mongoUri: os.Getenv("mongo_uri"),
-		redisUri: os.Getenv("redis_uri"),
 	}
 
 	rand.Seed(time.Now().UnixNano())
 
 	initDb()
-	initRedis()
 
 	// Modules
 	initialClassifications()
@@ -64,16 +60,6 @@ func initDb() {
 	badTopicsCollection = db.Collection("bad_topics")
 	watchedVideosCollection = db.Collection("watched_videos")
 	usersCollection = db.Collection("users")
-}
-
-func initRedis()  {
-	rclient = redis.NewClient(&redis.Options{
-		Addr: config.redisUri,
-	})
-	err := rclient.Ping(mctx).Err()
-	if err != nil {
-		panic(err)
-	}
 }
 
 func isBadTopic(topic string) bool {
