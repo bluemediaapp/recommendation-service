@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -19,7 +18,6 @@ var (
 	mctx    = context.Background()
 
 	videosCollection        *mongo.Collection
-	badTopicsCollection     *mongo.Collection
 	watchedVideosCollection *mongo.Collection
 	usersCollection         *mongo.Collection
 )
@@ -35,7 +33,6 @@ func main() {
 	initDb()
 
 	// Modules
-	initialClassifications()
 	userClassifications()
 
 	log.Fatal(app.Listen(config.port))
@@ -57,16 +54,6 @@ func initDb() {
 	// Setup tables
 	db := client.Database("blue")
 	videosCollection = db.Collection("video_metadata")
-	badTopicsCollection = db.Collection("bad_topics")
 	watchedVideosCollection = db.Collection("watched_videos")
 	usersCollection = db.Collection("users")
-}
-
-func isBadTopic(topic string) bool {
-	documentCount, err := badTopicsCollection.CountDocuments(mctx, bson.D{{"topic", topic}})
-	if err != nil {
-		log.Print(err)
-		return false
-	}
-	return documentCount != 0
 }
