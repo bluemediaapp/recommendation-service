@@ -9,6 +9,7 @@ import (
 	"math"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 func userClassifications() {
@@ -23,13 +24,21 @@ func userClassifications() {
 		if err != nil {
 			return err
 		}
+		ignoreRaw := strings.Split(ctx.Query("ignore", ""), "")
+		ignores := make([]int64, 0)
+		for _, ignoreId := range ignoreRaw {
+			id, err := strconv.ParseInt(ignoreId, 10, 64)
+			if err != nil {return err}
+			ignores = append(ignores, id)
+		}
 
-		videos := getRecommendedVideos(user)
+
+		videos := getRecommendedVideos(user, ignores)
 		return ctx.JSON(videos)
 	})
 }
 
-func getRecommendedVideos(user models.DatabaseUser) []models.DatabaseVideo {
+func getRecommendedVideos(user models.DatabaseUser, ignore []int64) []models.DatabaseVideo {
 	videos := getRandomVideos(100)
 	scoredVideos := make(map[float64]models.DatabaseVideo)
 
@@ -37,6 +46,9 @@ func getRecommendedVideos(user models.DatabaseUser) []models.DatabaseVideo {
 		video := videos[videoId]
 
 		if hasWatchedVideo(user, video) {
+			continue
+		}
+		if contains(ignore, video.Id) {
 			continue
 		}
 
@@ -133,4 +145,14 @@ func getUser(userId int64) (models.DatabaseUser, error) {
 		return models.DatabaseUser{}, err
 	}
 	return user, nil
+}
+
+
+func contains(slice []int64, val int64) bool {
+	for _, item := range slice {
+		if item == val {
+			return true
+		}
+	}
+	return false
 }
