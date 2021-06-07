@@ -13,7 +13,7 @@ import (
 )
 
 func userClassifications() {
-	app.Post("/user/:user_id", func(ctx *fiber.Ctx) error {
+	app.Get("/user/:user_id", func(ctx *fiber.Ctx) error {
 		// Get the user
 		userId, err := strconv.ParseInt(ctx.Params("user_id"), 10, 64)
 		if err != nil {
@@ -28,10 +28,11 @@ func userClassifications() {
 		ignores := make([]int64, 0)
 		for _, ignoreId := range ignoreRaw {
 			id, err := strconv.ParseInt(ignoreId, 10, 64)
-			if err != nil {return err}
+			if err != nil {
+				return err
+			}
 			ignores = append(ignores, id)
 		}
-
 
 		videos := getRecommendedVideos(user, ignores)
 		return ctx.JSON(videos)
@@ -66,7 +67,7 @@ func getRecommendedVideos(user models.DatabaseUser, ignore []int64) []models.Dat
 				interestScore = interestScore / 2
 				continue
 			}
-			calculatedScore := math.Min(float64(thisInterestScore) /100.0, 1)
+			calculatedScore := math.Min(float64(thisInterestScore)/100.0, 1)
 			interestScore = (interestScore + calculatedScore) / 2
 		}
 		if interestScore < 0 {
@@ -146,7 +147,6 @@ func getUser(userId int64) (models.DatabaseUser, error) {
 	}
 	return user, nil
 }
-
 
 func contains(slice []int64, val int64) bool {
 	for _, item := range slice {
