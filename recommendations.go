@@ -74,18 +74,9 @@ func getRecommendedVideos(user models.DatabaseUser, ignore []int64) []models.Dat
 			interestScore = 0
 		}
 
-		// Bad topics score
-		// A score starting at 1 getting .25 removed for every bad topic
-		// Minimum value is .1
-		badTopicsScore := 1 - (float64(video.BadTopics) * .25)
-		if badTopicsScore <= 0 {
-			badTopicsScore = .1
-		}
-
 		// Calculate score
 		score = 1000.0
 		score = score * ((interestScore * 10) + .1)
-		score = score * badTopicsScore
 
 		// Save score
 		scoredVideos[score] = video
