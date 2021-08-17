@@ -13,9 +13,9 @@ import (
 )
 
 func userClassifications() {
-	app.Get("/user/:user_id", func(ctx *fiber.Ctx) error {
+	app.Post("/user", func(ctx *fiber.Ctx) error {
 		// Get the user
-		userId, err := strconv.ParseInt(ctx.Params("user_id"), 10, 64)
+		userId, err := strconv.ParseInt(ctx.Get("auth_user_id"), 10, 64)
 		if err != nil {
 			return err
 		}
@@ -24,7 +24,7 @@ func userClassifications() {
 		if err != nil {
 			return err
 		}
-		ignoreRaw := strings.Split(ctx.Query("ignore", ""), "")
+		ignoreRaw := strings.Split(ctx.Get("ignore", ""), "")
 		ignores := make([]int64, 0)
 		for _, ignoreId := range ignoreRaw {
 			id, err := strconv.ParseInt(ignoreId, 10, 64)
@@ -79,7 +79,16 @@ func getRecommendedVideos(user models.DatabaseUser, ignore []int64) []models.Dat
 		score = score * ((interestScore * 10) + .1)
 
 		// Save score
-		scoredVideos[score] = video
+		// This is to prevent overriding videos with the same score
+		for {
+			_, exists := scoredVideos[score]
+			if !exists {
+				// Success
+				scoredVideos[score] = video
+				break
+			}
+			score -= 0.001
+		}
 	}
 	// Sort
 	keys := make([]float64, 0)
